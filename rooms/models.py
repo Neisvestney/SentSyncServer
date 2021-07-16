@@ -3,10 +3,12 @@ from django.db import models
 
 class Room(models.Model):
     code = models.CharField('Code', max_length=128)
+    tab_url = models.CharField('Tab url', max_length=512, default='', blank=True)
 
     def to_dict(self):
         return {
-            'users': [u.to_dict() for u in self.users.all()]
+            'users': [u.to_dict() for u in self.users.all()],
+            'tabUrl': self.tab_url
         }
 
     def __str__(self):

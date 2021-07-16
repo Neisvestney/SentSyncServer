@@ -41,13 +41,10 @@ class RoomConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def cleanup_db(self):
-        print("Clean up db")
         self.user.delete()
         if len(self.room.users.all()) == 0:
-            print("0")
             self.room.delete()
         elif self.user.host:
-            print("Host leave")
             new_host = self.room.users.first()
             new_host.host = True
             new_host.save()
@@ -78,6 +75,10 @@ class RoomConsumer(AsyncWebsocketConsumer):
                     if username := cmd.get('username'):
                         self.user.username = username
                         await database_sync_to_async(lambda: self.user.save())()
+                    if self.user.host and (tab_url := cmd.get('tabUrl')):
+                        self.room.tab_url = tab_url
+                        await database_sync_to_async(lambda: self.room.save())()
+
                     await self.sent_data_to_everyone()
 
         except:
@@ -91,6 +92,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
         })
 
     async def send_data(self):
+        self.room = await database_sync_to_async(lambda: Room.objects.get(id=self.room.id))() #  Refresh room object
         await self.send(text_data=json.dumps({
             'data': {
                 'you': self.user.to_dict(),
