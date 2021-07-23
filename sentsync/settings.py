@@ -69,6 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rooms',
     'channels',
+    'sass_processor'
 ]
 
 MIDDLEWARE = [
@@ -147,10 +148,32 @@ USE_L10N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
+# Static and media
 
-STATIC_URL = '/static/'
+STATICFILES_FINDERS = (
+        'django.contrib.staticfiles.finders.FileSystemFinder',
+        'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+        'sass_processor.finders.CssFinder',
+    )
+
+if not DEBUG:
+    STATIC_URL = os.environ.get("STATIC_URL")
+    STATIC_ROOT = os.path.join(BASE_DIR, '/var/www/static/')
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'static'),
+    )
+    MEDIA_ROOT = os.path.join(BASE_DIR, '/var/www/static/media')
+    MEDIA_URL = os.environ.get("STATIC_URL") + 'media/'
+else:
+    STATIC_URL = '/static/'
+    STATIC_ROOT = os.path.join(BASE_DIR, '/static/')
+
+    STATICFILES_DIRS = (
+        os.path.join(BASE_DIR, 'static'),
+    )
+
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    MEDIA_URL = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

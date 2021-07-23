@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load sass_tags %}
+
+{% block title %}Invite to watch{% endblock %}
+
+{% block head %}
+    <link href="{% sass_src 'sentsync/invite.scss' %}" rel="stylesheet"/>
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="centered">
+            <h1>Invite</h1>
+            {% if room %}
+                <p><a href="{% url 'index' %}">SentSync Chrome Extension</a></p>
+                <div id="info">
+                    <p>
+                        You invited to {{ room }}
+                        created by {{ host.username }}
+                        {% if room.tab_url %}to watch
+                            <a id="url" href="{{ room.tab_url }}">{{ room.tab_url }}</a>{% endif %}
+                    </p>
+                    <div class="form-group">
+                        <label>There are:</label>
+                        <ul>
+                            {% for user in room.users.all %}
+                                <li>{{ user.username }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <p>
+                    <button class="big" id="sentsync-accept-button" data-code="{{ room.code }}" disabled>Accept</button>
+                </p>
+                <p class="normal" style="display: none;" id="message-accepted">Accepted!</p>
+                <p class="danger" style="display: none;" id="message-already">Already connected!</p>
+            {% else %}
+                <p class="danger">Room does not exist</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <script type="application/javascript">
+        setInterval(() => {
+            const Http = new XMLHttpRequest();
+            Http.open("GET", location.href);
+            Http.send();
+
+            Http.onreadystatechange = (e) => {
+                let newPage = document.createElement('div');
+                newPage.innerHTML = Http.responseText;
+                let newInfo = newPage.querySelector('#info')
+                if (newInfo)
+                    document.getElementById('info').innerHTML = newInfo.innerHTML
+            }
+        }, 5000)
+    </script>
+{% endblock %}

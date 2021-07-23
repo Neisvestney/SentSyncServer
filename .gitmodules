@@ -1,0 +1,3 @@
+[submodule "static/general"]
+	path = static/general
+	url = https://github.com/Neisvestney/SentSync

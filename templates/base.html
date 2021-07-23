@@ -1,0 +1,16 @@
+{% load sass_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=280, initial-scale=1.0">
+    <title>{% block title %}{% endblock %} | SentSync</title>
+
+    <link href="{% sass_src 'general/src/styles/styles.scss' %}" rel="stylesheet"/>
+
+    {% block head %}{% endblock %}
+</head>
+<body>
+    {% block body %}{% endblock %}
+</body>
+</html>

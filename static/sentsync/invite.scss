@@ -1,0 +1,24 @@
+@import "./../general/src/styles/styles.scss";
+
+body {
+    margin: 0;
+}
+
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .centered {
+        width: 90vw;
+
+        @media (min-width: 600px) {
+            width: 600px;
+        }
+
+        padding: 10px;
+        border: 2px solid $primary;
+    }
+}
