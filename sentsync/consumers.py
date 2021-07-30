@@ -1,5 +1,6 @@
 import json
 import traceback
+from urllib.parse import parse_qs
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -12,9 +13,12 @@ class RoomConsumer(AsyncWebsocketConsumer):
         room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % room_name
 
+        params = parse_qs(self.scope['query_string'])
+        username = params.get(b'u')[0].decode("utf-8") if b'u' in params else RoomUser._meta.get_field('username').default
+
         self.room, _ = await database_sync_to_async(lambda: Room.objects.get_or_create(code=room_name))()
         self.user: RoomUser = await database_sync_to_async(
-            lambda: RoomUser.objects.create(host=len(self.room.users.all()) == 0, room=self.room)
+            lambda: RoomUser.objects.create(host=len(self.room.users.all()) == 0, room=self.room, username=username)
         )()
 
         # Join room group
@@ -25,7 +29,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
 
         await self.accept()
 
-        await self.sent_data_to_everyone(exclude=self.user.id)
+        await self.sent_data_to_everyone()
 
     async def disconnect(self, close_code):
         # Leave room group
