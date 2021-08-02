@@ -13,7 +13,7 @@ class RoomConsumer(AsyncWebsocketConsumer):
         room_name = self.scope['url_route']['kwargs']['room_name']
         self.room_group_name = 'chat_%s' % room_name
 
-        params = parse_qs(unquote(str(self.scope['query_string'])))
+        params = parse_qs(unquote(self.scope['query_string'].decode()))
         username = params.get('u')[0] if 'u' in params else RoomUser._meta.get_field('username').default
 
         self.room, _ = await database_sync_to_async(lambda: Room.objects.get_or_create(code=room_name))()
